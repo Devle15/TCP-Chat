@@ -1,0 +1,27 @@
+﻿[30/12/2025 00:01:51] ✅ Server started on port 5000...
+[30/12/2025 00:02:50] 🔌 A new client connected.
+[30/12/2025 00:02:50] 👤 Hậu connected.
+[30/12/2025 00:03:06] ❌ Hậu disconnected.
+[30/12/2025 00:03:18] 🔌 A new client connected.
+[30/12/2025 00:03:18] 👤 Hậu connected.
+[30/12/2025 00:03:25] Hậu: chào cậu
+[30/12/2025 00:03:55] Hậu: có gì mới kh
+[30/12/2025 00:06:07] 📎 Hậu gửi file 'Screenshot 2025-12-30 000414.png' đến ALL
+[21/01/2026 00:54:57] ✅ Server started on port 5000...
+[21/01/2026 00:55:03] 🔌 A new client connected.
+[21/01/2026 00:55:03] 👤 hậu connected.
+[21/01/2026 00:55:32] 🔌 A new client connected.
+[21/01/2026 00:55:32] 👤 khoa connected.
+[21/01/2026 00:55:43] khoa: hello
+[21/01/2026 00:55:49] hậu: lô cu
+[21/01/2026 00:55:52] 📎 hậu gửi file 'Screenshot 2026-01-21 005258.png' đến ALL
+[21/01/2026 01:00:02] khoa: @hậu lô
+[21/01/2026 01:02:21] 🔌 A new client connected.
+[21/01/2026 01:02:21] 👤 bo connected.
+[21/01/2026 01:02:29] bo: @hậu lô lô
+[21/01/2026 01:03:04] [Private] hậu → khoa: chào m
+[21/01/2026 01:03:16] [Private] khoa → hậu: ok nhé
+[21/01/2026 01:05:16] [Private] bo → khoa: chào m
+[21/01/2026 01:05:39] ❌ hậu disconnected.
+[21/01/2026 01:06:37] 🔌 A new client connected.
+[21/01/2026 01:06:37] 👤 hậu connected.
