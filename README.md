@@ -2,9 +2,9 @@
 
 ## Giới thiệu
 TCP-Chat là ứng dụng chat client–server sử dụng giao thức TCP Socket,
-được xây dựng bằng C# (.NET).
+được xây dựng bằng C# (.NET)
 Hệ thống cho phép nhiều client kết nối đến server để gửi/nhận tin nhắn
-và gửi file trong mạng nội bộ.
+và gửi file trong mạng nội bộ
 
 ## Công nghệ sử dụng
 - Ngôn ngữ: C#
