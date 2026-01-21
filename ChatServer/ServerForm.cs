@@ -14,7 +14,7 @@ namespace ChatServer
     public class Form1 : Form
     {
         // ====== Các control trên giao diện ======
-        TextBox txtLog;
+        private RichTextBox txtLog;
         Button btnStart, btnStop, btnViewHistory;
         FlowLayoutPanel pnlClients;
 
@@ -22,7 +22,6 @@ namespace ChatServer
         TcpListener listener;                     // Lắng nghe client mới
         List<TcpClient> clients = new List<TcpClient>();     // Danh sách client đang kết nối
         Dictionary<TcpClient, string> clientNames = new Dictionary<TcpClient, string>(); // Ánh xạ Client → Tên người dùng
-
         bool isRunning = false;                  // Trạng thái server
 
         public Form1()
@@ -193,7 +192,9 @@ namespace ChatServer
             }
 
             string history = System.IO.File.ReadAllText(path, Encoding.UTF8);
-
+            Form f = new Form() { Text = "Nhật ký hệ thống", 
+                Size = new Size(600, 500), 
+                StartPosition = FormStartPosition.CenterParent };
             // Hiển thị lịch sử trong cửa sổ mới
             Form f = new Form()
             {
@@ -490,6 +491,11 @@ namespace ChatServer
 
             try { System.IO.File.AppendAllText(path, line + Environment.NewLine, Encoding.UTF8); }
             catch { }
+        }
+
+        private void InitializeComponent()
+        {
+
         }
 
         // ===================================================================
