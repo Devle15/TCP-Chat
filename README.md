@@ -45,4 +45,4 @@ và gửi file trong mạng nội bộ.
 
 ## Ghi chú
 - Chạy nhiều client để test chat nhiều người
-- Server và client có thể chạy trên các máy khác nhau trong cùng mạng LAN
+- Server và client có thể chạy trên các máy khác nhau trong cùng mạng LAN.
