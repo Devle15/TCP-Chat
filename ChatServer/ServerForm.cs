@@ -234,7 +234,7 @@ namespace ChatServer
                     lock (clients) clients.Add(client);
 
                     // Log ngay khi có thiết bị kết nối vào Socket
-                    AppendLog( "Thiết bị mới kết nối từ: {client.Client.RemoteEndPoint}");
+                    AppendLog("CONN", $"Thiết bị mới kết nối từ: {client.Client.RemoteEndPoint}", Color.DarkCyan);
 
                     // Tạo thread riêng để xử lý song song nhiều người dùng (Multithreading)
                     Thread t = new Thread(HandleClient);
@@ -287,7 +287,7 @@ namespace ChatServer
                             totalRead += read;
                         }
                              
-                        AppendLog($"📎 {senderName} gửi file '{fileName}' đến {target}");
+                        AppendLog("FILE",$"📎 {senderName} gửi file '{fileName}' đến {target}", Color.Purple);
 
                         // Gửi file đến tất cả
                         if (target.Equals("ALL", StringComparison.OrdinalIgnoreCase))
@@ -328,7 +328,7 @@ namespace ChatServer
                             clientNames[client] = name;
                         }
 
-                        AppendLog($"👤 {name} connected.");
+                        AppendLog("JOIN",$"👤 {name} connected.", Color.Green);
                         Broadcast($"{name} joined the chat.", client);
                         UpdateClientList();
                         continue;
@@ -344,7 +344,7 @@ namespace ChatServer
                 if (clientNames.ContainsKey(client))
                 {
                     string name = clientNames[client];
-                    AppendLog($"❌ {name} disconnected.");
+                    AppendLog("QUIT",$"❌ {name} disconnected.", Color.Gray);
                     Broadcast($"{name} left the chat.", client);
 
                     lock (clients)
@@ -383,7 +383,7 @@ namespace ChatServer
                         string msg = $"[Private] {senderName} → {target}: {content}";
                         SendToClient(msg, targetClient);
                         SendToClient(msg, sender);
-                        AppendLog(msg);
+                        AppendLog("PRIV",$"🔒 {msg}", Color.DeepPink);
                     }
                     else
                     {
@@ -395,7 +395,7 @@ namespace ChatServer
 
             // ===== NGƯỜI GỬI → TIN NHẮN PUBLIC =====
             string normalMsg = $"{senderName}: {message}";
-            AppendLog( normalMsg);
+            AppendLog("CHAT",normalMsg, Color.Black);
             Broadcast(normalMsg, sender);
         }
 
@@ -473,7 +473,7 @@ namespace ChatServer
 
         // ===================================================================
         // GHI LOG + LƯU VÀO FILE history.txt
-        // GHI LOG VỚI NHIỀU MÀU SẮC CHO SERVER 
+        // GHI LOG VỚI NHIỀU MÀU SẮC CHO SERVER
         // -status: nhãn trạng thái (INFO, JOIN, CONN, FILE, CHAT,..)
         // -message: nội dung của sự kiện đó
         // - color: màu sắc đại diện cho sự kiện đó
