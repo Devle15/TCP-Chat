@@ -14,7 +14,7 @@ namespace ChatServer
     public class Form1 : Form
     {
         // ====== Các control trên giao diện ======
-        TextBox txtLog;
+        private RichTextBox txtLog;
         Button btnStart, btnStop, btnViewHistory;
         FlowLayoutPanel pnlClients;
 
@@ -22,7 +22,7 @@ namespace ChatServer
         TcpListener listener;                     // Lắng nghe client mới
         List<TcpClient> clients = new List<TcpClient>();     // Danh sách client đang kết nối
         Dictionary<TcpClient, string> clientNames = new Dictionary<TcpClient, string>(); // Ánh xạ Client → Tên người dùng
-
+        private RichTextBox richTextBox1;
         bool isRunning = false;                  // Trạng thái server
 
         public Form1()
@@ -90,10 +90,10 @@ namespace ChatServer
                 BackColor = Color.White
             };
 
-            txtLog = new TextBox()
+            txtLog = new RichTextBox()
             {
                 Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
+                ScrollBars = RichTextBoxScrollBars.Both,
                 Dock = DockStyle.Fill,
                 Font = new Font("Consolas", 10),
                 ReadOnly = true,
@@ -151,7 +151,7 @@ namespace ChatServer
             serverThread.IsBackground = true;
             serverThread.Start();
 
-            AppendLog("✅ Server started on port 5000...");
+            AppendLog("INFO", "✅ Server started on port 5000...", Color.Blue);
             btnStart.Enabled = false;
             btnStop.Enabled = true;
         }
@@ -173,7 +173,7 @@ namespace ChatServer
             }
 
             pnlClients.Controls.Clear();
-            AppendLog("🛑 Server stopped.");
+            AppendLog("WARN","🛑 Server stopped.", Color.Red);
 
             btnStart.Enabled = true;
             btnStop.Enabled = false;
@@ -193,53 +193,58 @@ namespace ChatServer
             }
 
             string history = System.IO.File.ReadAllText(path, Encoding.UTF8);
-
-            // Hiển thị lịch sử trong cửa sổ mới
-            Form f = new Form()
-            {
-                Text = "Chat History",
-                Size = new Size(600, 500),
+            Form f = new Form() { Text = "Chat history", 
+                Size = new Size(600, 500), 
                 StartPosition = FormStartPosition.CenterParent,
                 BackColor = Color.White
             };
-            TextBox txt = new TextBox()
+
+            //  Dùng RichTextBox để hiển thị log lịch sử 
+            RichTextBox txt = new RichTextBox()
             {
                 Multiline = true,
                 ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
                 Dock = DockStyle.Fill,
                 Font = new Font("Consolas", 10),
-                Text = history
+                Text = history,
+                BackColor = Color.FromArgb(33, 37, 41), // Màu nền tối chuyên nghiệp
+                ForeColor = Color.Gainsboro
             };
             f.Controls.Add(txt);
             f.ShowDialog();
         }
 
+        
         // ===================================================================
-        // BẮT ĐẦU SERVER – LẮNG NGHE CLIENT MỚI
+        // BẮT ĐẦU SERVER –  THÊM LOG TRẠNG THÁI KẾT NỐI
         // ===================================================================
         void StartServer()
         {
-            listener = new TcpListener(IPAddress.Any, 5000);
-            listener.Start();
-            isRunning = true;
-
-            while (isRunning)
+            try 
             {
-                try
+                // Khởi tạo listener tại port 5000 (Tầng Giao vận - Transport Layer)
+                listener = new TcpListener(IPAddress.Any, 5000);
+                listener.Start();
+                isRunning = true;
+
+                while (isRunning)
                 {
-                    // Chấp nhận client mới
+                    // Chấp nhận client mới 
                     TcpClient client = listener.AcceptTcpClient();
                     lock (clients) clients.Add(client);
 
-                    AppendLog("🔌 A new client connected.");
+                    // Log ngay khi có thiết bị kết nối vào Socket
+                    AppendLog("CONN", $"Thiết bị mới kết nối từ: {client.Client.RemoteEndPoint}", Color.DarkCyan);
 
-                    // Mỗi client chạy trên 1 thread riêng
+                    // Tạo thread riêng để xử lý song song nhiều người dùng (Multithreading)
                     Thread t = new Thread(HandleClient);
                     t.IsBackground = true;
                     t.Start(client);
                 }
-                catch { break; }
+            }
+            catch (Exception ex)
+            {
+                   AppendLog("ERROR", "Lỗi Server: " + ex.Message, Color.Red);
             }
         }
 
@@ -281,8 +286,8 @@ namespace ChatServer
                             if (read == 0) break;
                             totalRead += read;
                         }
-
-                        AppendLog($"📎 {senderName} gửi file '{fileName}' đến {target}");
+                             
+                        AppendLog("FILE",$"📎 {senderName} gửi file '{fileName}' đến {target}", Color.Purple);
 
                         // Gửi file đến tất cả
                         if (target.Equals("ALL", StringComparison.OrdinalIgnoreCase))
@@ -323,7 +328,7 @@ namespace ChatServer
                             clientNames[client] = name;
                         }
 
-                        AppendLog($"👤 {name} connected.");
+                        AppendLog("JOIN",$"👤 {name} connected.", Color.Green);
                         Broadcast($"{name} joined the chat.", client);
                         UpdateClientList();
                         continue;
@@ -339,7 +344,7 @@ namespace ChatServer
                 if (clientNames.ContainsKey(client))
                 {
                     string name = clientNames[client];
-                    AppendLog($"❌ {name} disconnected.");
+                    AppendLog("QUIT",$"❌ {name} disconnected.", Color.Gray);
                     Broadcast($"{name} left the chat.", client);
 
                     lock (clients)
@@ -378,7 +383,7 @@ namespace ChatServer
                         string msg = $"[Private] {senderName} → {target}: {content}";
                         SendToClient(msg, targetClient);
                         SendToClient(msg, sender);
-                        AppendLog(msg);
+                        AppendLog("PRIV",$"🔒 {msg}", Color.DeepPink);
                     }
                     else
                     {
@@ -390,7 +395,7 @@ namespace ChatServer
 
             // ===== NGƯỜI GỬI → TIN NHẮN PUBLIC =====
             string normalMsg = $"{senderName}: {message}";
-            AppendLog(normalMsg);
+            AppendLog("CHAT",normalMsg, Color.Black);
             Broadcast(normalMsg, sender);
         }
 
@@ -468,18 +473,32 @@ namespace ChatServer
 
         // ===================================================================
         // GHI LOG + LƯU VÀO FILE history.txt
+        // GHI LOG VỚI NHIỀU MÀU SẮC CHO SERVER
+        // -status: nhãn trạng thái (INFO, JOIN, CONN, FILE, CHAT,..)
+        // -message: nội dung của sự kiện đó
+        // - color: màu sắc đại diện cho sự kiện đó
         // ===================================================================
-        void AppendLog(string msg)
+        private void AppendLog(string status, string message, Color color)
         {
             if (txtLog.InvokeRequired)
             {
-                txtLog.Invoke(new Action(() => AppendLog(msg)));
+                txtLog.Invoke(new Action(() => AppendLog(status, message, color)));
                 return;
             }
 
-            txtLog.AppendText(msg + Environment.NewLine);
+            string time = DateTime.Now.ToString("HH:mm:ss");
+
+            txtLog.SelectionStart = txtLog.TextLength;
+            txtLog.SelectionFont = new Font(txtLog.Font, FontStyle.Bold);
+            txtLog.SelectionColor = color;
+            txtLog.AppendText($"[{time}] [{status.ToUpper()}] ");
+
+            txtLog.SelectionFont = new Font(txtLog.Font, FontStyle.Regular);
+            txtLog.SelectionColor = Color.Black;
+            txtLog.AppendText($"{message}{Environment.NewLine}");
+
             txtLog.ScrollToCaret();
-            SaveToHistory(msg);
+            SaveToHistory($"[{status.ToUpper()}] {message}");
         }
 
         // Lưu log vào history.txt
@@ -490,6 +509,28 @@ namespace ChatServer
 
             try { System.IO.File.AppendAllText(path, line + Environment.NewLine, Encoding.UTF8); }
             catch { }
+        }
+
+        private void InitializeComponent()
+        {
+            richTextBox1 = new RichTextBox();
+            SuspendLayout();
+            // 
+            // richTextBox1
+            // 
+            richTextBox1.Location = new Point(0, 0);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.Size = new Size(125, 120);
+            richTextBox1.TabIndex = 0;
+            richTextBox1.Text = "";
+            // 
+            // Form1
+            // 
+            ClientSize = new Size(282, 253);
+            Controls.Add(richTextBox1);
+            Name = "Form1";
+            ResumeLayout(false);
+
         }
 
         // ===================================================================
